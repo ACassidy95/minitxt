@@ -9,7 +9,7 @@
 #include <unistd.h>
 
 // Used for detecting ctrl+ key combinations
-#define CTRL_K(k) ((k) & 0x1f);
+#define CTRL_K(k) ((k) & 0x1f)
 
 // Remembers the state of the terminal
 // before this program executes so it can
