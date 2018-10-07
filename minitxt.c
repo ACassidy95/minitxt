@@ -22,7 +22,7 @@ void enable_raw_mode()
 	tcgetattr(STDIN_FILENO, &orig_termios);
 	atexit(disable_raw_mode);
  
-	struct termios raw = orig
+	struct termios raw = orig_termios;
 
 	// Disable the following input flags
 	//	ICRNL	- disable auto conversion of \n to \r\n in input
@@ -43,6 +43,8 @@ void enable_raw_mode()
 	raw.c_oflag		&= ~(OPOST);
 	raw.c_cflag 		|= (CS8); // set char size to 8 if not already
 	raw.c_lflag 		&= ~(ECHO | ICANON | ISIG | IEXTEN);
+
+	// Set read timeout
 	raw.c_cc[VMIN] 		= 0;
 	raw.c_cc[VTIME] 	= 1;
 
@@ -53,7 +55,17 @@ int main(int argc, char const **argv)
 {
 	enable_raw_mode();
 
-	while(1) 
+	while(1) {
+		char c = '\0';
+		read(STDIN_FILENO, &c, 1);
+		if(iscntrl(c)) {
+			printf("%d\r\n", c);
+		} else {
+			printf("%d('%c')\r\n", c, c);
+		}
+
+		if(c == 'q')	break;
+	}
 
 	return 0;
 }
