@@ -1,4 +1,5 @@
 #include <ctype.h>
+#include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <termios.h>
@@ -9,17 +10,26 @@
 // be set back to canonical mode
 struct termios orig_termios;
 
+// Error handling mode
+void die(char* s)
+{
+	perror(s);
+	exit(1);
+}
+
 // This fucntion will be called on exit to 
 // return the terminal to its original state
 void disable_raw_mode() 
 {
-	tcsetattr(STDIN_FILENO, TCSAFLUSH, &orig_termios);
+	if(tcsetattr(STDIN_FILENO, TCSAFLUSH, &orig_termios) == -1)
+		die("tcsetattr");
 }
 
 void enable_raw_mode() 
 {
 	// Set orig_termios to current settings
-	tcgetattr(STDIN_FILENO, &orig_termios);
+	if(tcgetattr(STDIN_FILENO, &orig_termios) == -1) 
+		die("tcgetattr");
 	atexit(disable_raw_mode);
  
 	struct termios raw = orig_termios;
@@ -48,7 +58,8 @@ void enable_raw_mode()
 	raw.c_cc[VMIN] 		= 0;
 	raw.c_cc[VTIME] 	= 1;
 
-	tcsetattr(STDIN_FILENO, TCSAFLUSH, &raw);
+	if(tcsetattr(STDIN_FILENO, TCSAFLUSH, &raw) == -1)
+		die("tcsetattr");
 }
 
 int main(int argc, char const **argv)
@@ -57,7 +68,8 @@ int main(int argc, char const **argv)
 
 	while(1) {
 		char c = '\0';
-		read(STDIN_FILENO, &c, 1);
+		if(read(STDIN_FILENO, &c, 1) == -1 && errno != EAGAIN)
+			die("read");
 		if(iscntrl(c)) {
 			printf("%d\r\n", c);
 		} else {
