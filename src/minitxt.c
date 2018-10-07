@@ -14,7 +14,8 @@ int main(int argc, char const **argv)
 			printf("%d('%c')\r\n", c, c);
 		}
 
-		if(c == 'q')	break;
+		if(c == CTRL_K('q'))	
+			break;
 	}
 
 	return 0;
