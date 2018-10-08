@@ -18,7 +18,7 @@ struct termios orig_termios;
 
 // kill with error - takes in an error
 // string and prints it to stdout and exits
-void kwerror(char* s);
+void kwerror(const char* s);
 
 // disable raw mode - return terminal to
 // canonical mode on termination
@@ -27,5 +27,13 @@ void drawm();
 // enable raw mode - change terminal to
 // raw mode from canonical mode
 void erawm();
+
+// refreshes the screen
+void rfscrn();
+
+// read key & process key - read a key 
+// press and decide how to respond
+char rkey();
+void pkey();
 
 #endif
