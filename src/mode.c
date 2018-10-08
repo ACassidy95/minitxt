@@ -1,8 +1,17 @@
 #include "../include/minitxt.h"
+#include "../include/state.h"
+
+void init()
+{
+	if(gwsize(&TERMINAL.scrrows, &TERMINAL.scrcols) == -1) {
+		kwerror("Init");
+	}
+}
 
 // Error handling mode
 void kwerror(const char* s)
 {
+	rfscrn();
 	perror(s);
 	exit(1);
 }
@@ -11,7 +20,7 @@ void kwerror(const char* s)
 // return the terminal to its original state
 void drawm() 
 {
-	if(tcsetattr(STDIN_FILENO, TCSAFLUSH, &orig_termios) == -1) {
+	if(tcsetattr(STDIN_FILENO, TCSAFLUSH, &TERMINAL.orig_termios) == -1) {
 		kwerror("tcsetattr");
 	}
 }
@@ -19,12 +28,12 @@ void drawm()
 void erawm() 
 {
 	// Set orig_termios to current settings
-	if(tcgetattr(STDIN_FILENO, &orig_termios) == -1) {
+	if(tcgetattr(STDIN_FILENO, &TERMINAL.orig_termios) == -1) {
 		kwerror("tcgetattr");
 	}
 	atexit(drawm);
  
-	struct termios raw = orig_termios;
+	struct termios raw = TERMINAL.orig_termios;
 
 	// Disable the following input flags
 	//	ICRNL	- disable auto conversion of \n to \r\n in input
@@ -79,6 +88,7 @@ void pkey()
 
 	switch(c) {
 		case CTRL_K('q'):
+			rfscrn();
 			exit(0);
 			break;
 	}
@@ -89,4 +99,28 @@ void rfscrn()
 {
 	write(STDOUT_FILENO, "\x1b[2J", 4);
 	write(STDOUT_FILENO, "\x1b[H", 3);
+}
+
+// Print a column of tildes and reposition cursor
+// back at the top of the screen
+void drscrn()
+{
+	for(int i = 0; i < TERMINAL.scrrows; ++i) {
+		write(STDOUT_FILENO, "~\r\n", 3);
+	}
+
+	write(STDOUT_FILENO, "\x1b[H", 3);
+}
+
+int gwsize(int* r, int* c) 
+{
+	struct winsize w; 
+
+	if(ioctl(STDOUT_FILENO, TIOCGWINSZ, &w) == -1 || w.ws_col == 0) {
+		return -1;
+	} else {
+		*r = w.ws_row;
+		*c = w.ws_col;
+		return 0;
+	}
 }

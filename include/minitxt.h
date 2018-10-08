@@ -7,15 +7,17 @@
 #include <stdlib.h>
 #include <termios.h>
 #include <unistd.h>
+#include <sys/ioctl.h>
 
 // Used for detecting ctrl+ key combinations
 #define CTRL_K(k) ((k) & 0x1f)
 
-// Remembers the state of the terminal
-// before this program executes so it can
-// be set back to canonical mode
-struct termios orig_termios;
+// Global variable to store terminal state
+struct config_t TERMINAL;
 
+void init();
+
+/* Terminal mode functions */
 // kill with error - takes in an error
 // string and prints it to stdout and exits
 void kwerror(const char* s);
@@ -28,12 +30,20 @@ void drawm();
 // raw mode from canonical mode
 void erawm();
 
-// refreshes the screen
-void rfscrn();
-
+/* Input functions */
 // read key & process key - read a key 
 // press and decide how to respond
 char rkey();
 void pkey();
+
+/* Output functions */
+// refreshes the screen
+void rfscrn();
+
+// draw a vim-like column of tildes on the screen
+void drscrn();
+
+// get the size of the window
+int gwsize(int* r, int* c);
 
 #endif
