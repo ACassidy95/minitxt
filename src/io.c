@@ -1,3 +1,6 @@
+#include "../include/minitxt.h"
+#include "../include/state.h"
+
 // Waits for a single keypress and returns it
 char rkey()
 {
