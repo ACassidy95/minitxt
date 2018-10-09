@@ -1,5 +1,5 @@
 #include "../include/minitxt.h"
-#include "../include/state.h"
+//#include "../include/state.h"
 
 int main(int argc, char const **argv)
 {
@@ -8,7 +8,6 @@ int main(int argc, char const **argv)
 
 	while(1) {
 		rfscrn();
-		drscrn();
 		pkey();
 	}
 

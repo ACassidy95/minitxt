@@ -1,5 +1,5 @@
 #include "../include/minitxt.h"
-#include "../include/state.h"
+//#include "../include/state.h"
 
 // Waits for a single keypress and returns it
 char rkey()
@@ -33,25 +33,38 @@ void pkey()
 // Refresh screen with escape sequence '\x1b[2J'
 // and position the cursor at top left with 
 // sequence '\x1b[H'
+//
+// \x1b[?25l and \x1b[?25h are used to briefly
+// hide the cursor and reshow it. Used to prevent
+// flicker effect in screen repainting
 void rfscrn()
 {
-	write(STDOUT_FILENO, "\x1b[2J", 4);
-	write(STDOUT_FILENO, "\x1b[H", 3);
+	buffer_t buf = BUFFER_INIT; 
+
+	appendbuf(&buf, "\x1b[?25l", 6);
+	appendbuf(&buf, "\x1b[H", 3);
+
+	drscrn(&buf);
+
+	appendbuf(&buf, "\x1b[H", 3);
+	appendbuf(&buf, "\x1b[?25h", 6);
+
+	write(STDOUT_FILENO, buf.str, buf.len);
+	freebuf(&buf);
 }
 
 // Print a column of tildes and reposition cursor
 // back at the top of the screen
-void drscrn()
+void drscrn(buffer_t* buf)
 {
 	for(int i = 0; i < TERMINAL.scrrows; ++i) {
-		write(STDOUT_FILENO, "~", 1);
+		appendbuf(buf, "~", 1);
 
+		appendbuf(buf, "\x1b[K", 3);
 		if(i < TERMINAL.scrrows - 1) {
-			write(STDOUT_FILENO, "\r\n", 2);
+			appendbuf(buf, "\r\n", 2);
 		}
 	}
-
-	write(STDOUT_FILENO, "\x1b[H", 3);
 }
 
 // This function gets the position of the cursor 
@@ -104,4 +117,24 @@ int gwsize(int* r, int* c)
 		*c = w.ws_col;
 		return 0;
 	}
+}
+
+// Appends data to buffer and updates the buffer length
+void appendbuf(buffer_t* buf, const char* s, int l)
+{
+	char* c = realloc(buf->str, buf->len + l);
+
+	// exit if allocation fails
+	if(c == NULL) {
+		return; 
+	}
+
+	memcpy(&c[buf->len], s, l);
+	buf->str = c; 
+	buf->len += l;
+}
+
+void freebuf(buffer_t* buf)
+{
+	free(buf->str);
 }

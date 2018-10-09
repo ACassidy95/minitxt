@@ -1,5 +1,5 @@
 #include "../include/minitxt.h"
-#include "../include/state.h"
+//#include "../include/state.h"
 
 void init()
 {
