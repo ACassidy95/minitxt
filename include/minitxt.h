@@ -12,9 +12,6 @@
 // Used for detecting ctrl+ key combinations
 #define CTRL_K(k) ((k) & 0x1f)
 
-// Global variable to store terminal state
-struct config_t TERMINAL;
-
 void init();
 
 /* Terminal mode functions */
@@ -43,7 +40,8 @@ void rfscrn();
 // draw a vim-like column of tildes on the screen
 void drscrn();
 
-// get the size of the window
+// get window information
 int gwsize(int* r, int* c);
+int cursorpos(int* r, int* c);
 
 #endif
