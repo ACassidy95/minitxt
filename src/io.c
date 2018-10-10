@@ -53,18 +53,41 @@ void rfscrn()
 	freebuf(&buf);
 }
 
-// Print a column of tildes and reposition cursor
-// back at the top of the screen
+// Print a column of tildes and welcome messgae
+// reposition cursor back at the top of the screen
 void drscrn(buffer_t* buf)
 {
-	for(int i = 0; i < TERMINAL.scrrows; ++i) {
-		appendbuf(buf, "~", 1);
+  	for (int i = 0; i < TERMINAL.scrrows; i++) {
+    		if(i == TERMINAL.scrrows / 10) {
+    			char* msg = calloc(80, sizeof(char));
+    			int len = snprintf(msg, 80 * sizeof(char), "Welcome to %s", VER);
 
-		appendbuf(buf, "\x1b[K", 3);
-		if(i < TERMINAL.scrrows - 1) {
-			appendbuf(buf, "\r\n", 2);
-		}
-	}
+    			if(len > TERMINAL.scrcols) {
+    				len = TERMINAL.scrcols;
+    			}
+
+    			int padding = (TERMINAL.scrcols - len) >> 1;
+
+    			if(padding) {
+    				appendbuf(buf, "~", 1); 
+    				--padding;
+    			}
+
+    			while(--padding) {
+    				appendbuf(buf, " ", 1);
+    			}
+
+    			appendbuf(buf, msg, len);
+    		} else {
+    			appendbuf(buf, "~", 1);
+    		}
+
+    		appendbuf(buf, "\x1b[K", 3);
+
+    		if(i < TERMINAL.scrrows - 1) {
+    			appendbuf(buf, "\r\n", 2);
+    		}
+  	}
 }
 
 // This function gets the position of the cursor 

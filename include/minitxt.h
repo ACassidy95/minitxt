@@ -13,6 +13,8 @@
 // Used for detecting ctrl+ key combinations
 #define CTRL_K(k) ((k) & 0x1f)
 
+#define VER "MiniTxt Version 0.0.1\0"
+
 typedef struct config_t {
 	int scrrows;
 	int scrcols; 
