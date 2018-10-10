@@ -122,16 +122,25 @@ void mvcursor(int c)
 {
 	switch(c) {
 		case UARROW:
-			--TERMINAL.y_pos;
+			if(TERMINAL.y_pos != 0) {
+				--TERMINAL.y_pos;
+			}
 			break;
 		case DARROW:
-			++TERMINAL.y_pos;
+			if(TERMINAL.y_pos != TERMINAL.scrrows - 1) {
+				++TERMINAL.y_pos;
+			}
 			break;
 		case LARROW:
-			--TERMINAL.x_pos;
+			if(TERMINAL.x_pos != 0) {
+				--TERMINAL.x_pos;
+			}
 			break;
 		case RARROW:
-			++TERMINAL.x_pos;
+			if(TERMINAL.x_pos != TERMINAL.scrcols - 1) {
+				++TERMINAL.x_pos;
+			}
+			break;
 	}
 }
 
