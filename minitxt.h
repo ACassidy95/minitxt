@@ -24,6 +24,10 @@
 #define CLEAR_SCREEN	"\x1b[2J"
 #define CLEAR_LINE	"\x1b[K"
 
+
+// Defines the current state of the terminal
+// and stores the original state to revert to
+// when execution finishes
 typedef struct config_t {
 	int x_pos;
 	int y_pos;
@@ -37,18 +41,22 @@ typedef struct buffer_t {
 	int len; 
 } buffer_t;
 
-// Global variable to store terminal state
 struct config_t TERMINAL;
 
 // Base state for a buffer is an empty string
 // with 0 length
 #define BUFFER_INIT 	{NULL, 0}
 
+// Key mappings
 enum keys {
 	UARROW = 1000,
 	DARROW,
 	LARROW,
-	RARROW
+	RARROW,
+	PGUP,
+	PGDN,
+	HOME,
+	END,
 };
 
 void init();

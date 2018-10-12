@@ -20,11 +20,37 @@ int rkey()
 		if(read(STDIN_FILENO, &seq[1], 1) != 1) return '\x1b';
 
 		if(seq[0] == '[') {
-			switch(seq[1]) {
-				case 'A' : return UARROW;
-				case 'B' : return DARROW;
-				case 'C' : return RARROW; 
-				case 'D' : return LARROW;
+			if(seq[1] >= '0' && seq[1] <= '9'){
+				if(read(STDIN_FILENO, &seq[2], 1) != 1) return '\x1b';
+				if(seq[2] == '~') {
+					switch(seq[2]) {
+						// Home and end have two ways of being sent each
+						// correspondance here is awkward.
+						case '1' : return HOME;
+						case '3' : return DEL;
+						case '4' : return END;
+						case '5' : return PGUP;
+						case '6' : return PGDN;
+						case '7' : return HOME;
+						case '8' : return END;
+					}
+				}
+			} else {
+				switch(seq[1]) {
+					case 'A' : return UARROW;
+					case 'B' : return DARROW;
+					case 'C' : return RARROW; 
+					case 'D' : return LARROW;
+					case 'H' : return HOME;
+					case 'F' : return END;
+				}
+			}
+		} else if (seq[0] == 'O') {
+			// Home and end esc sequence must also be dealt
+			// with in this format <esc>H/F or <esc>OH/OF
+			switch(seq[0]) {
+				case 'H' : return HOME;
+				case 'F' : return END;
 			}
 		}
 
@@ -46,6 +72,23 @@ void pkey()
 			write(STDOUT_FILENO, MV_CURSOR_00, 3);
 			exit(0);
 			break;
+
+		case HOME:
+			TERMINAL.x_pos = 0;
+			break;
+		case END:
+			TERMINAL.x_pos = TERMINAL.scrcols - 1; 
+
+		case PGUP:
+		case PGDN:
+			{
+				int times = TERMINAL.scrrows - 1;
+				while(--times) {
+					mvcursor(c == PGUP ? UARROW : DARROW);
+				}
+			} 
+			break; 
+
 		case UARROW:
 		case DARROW:
 		case LARROW:
@@ -118,6 +161,8 @@ void drscrn(buffer_t* buf)
   	}
 }
 
+// Moves cursor around the screen while ensuring its 
+// current coordinates don't move beyond the screen bounds
 void mvcursor(int c)
 {
 	switch(c) {
