@@ -44,11 +44,13 @@ void erawm()
 	//	
 	// Disable the following output flags
 	//	OPOST	- disable auto conversion of \n to \r\n in output
+	//
 	// Disable the following local flags
 	//	ECHO 	- stop printing input
 	//	ICANON 	- enter raw mode
 	//	ISIG	- stop sending signals, e.g. SIGINT, SIGSTP
 	//	IEXTEN	- diable ctrl-v
+	//
 	// and save this as the terminal's current state
 	// When all these changes are made, the terminal will
 	// be in raw mode
