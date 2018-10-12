@@ -57,6 +57,7 @@ enum keys {
 	PGDN,
 	HOME,
 	END,
+	DEL
 };
 
 void init();
