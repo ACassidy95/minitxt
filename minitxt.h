@@ -1,6 +1,10 @@
 #ifndef _MINITXT_H_
 #define _MINITXT_H_
 
+#define _DEFAULT_SOURCE
+#define _BSD_SOURCE
+#define _GNU_SOURCE
+
 #include <ctype.h>
 #include <errno.h>
 #include <stdio.h>
@@ -9,6 +13,7 @@
 #include <termios.h>
 #include <unistd.h>
 #include <sys/ioctl.h>
+#include <sys/types.h>
 
 // Used for detecting ctrl+ key combinations
 #define CTRL_K(k) 	((k) & 0x1f)
@@ -25,6 +30,12 @@
 #define CLEAR_LINE	"\x1b[K"
 
 
+// Defines a row in the editor
+typedef struct edrow_t {
+	int len;
+	char* chars;
+} edrow_t;
+
 // Defines the current state of the terminal
 // and stores the original state to revert to
 // when execution finishes
@@ -32,7 +43,9 @@ typedef struct config_t {
 	int x_pos;
 	int y_pos;
 	int scrrows;
-	int scrcols; 
+	int scrcols;
+	int ctrows;
+	edrow_t row; 
 	struct termios orig_termios;
 } config_t;
 
@@ -101,6 +114,12 @@ void drscrn(buffer_t* buf);
 int gwsize(int* r, int* c);
 int cursorpos(int* r, int* c);
 void mvcursor(int c);
+
+/* ============================================
+	    	File IO functions 
+   ===========================================*/
+
+void edopen(char* fname); 
 
 /* ============================================
 	    	Buffer functions 
