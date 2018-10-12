@@ -24,8 +24,9 @@ int rkey()
 				if(read(STDIN_FILENO, &seq[2], 1) != 1) return '\x1b';
 				if(seq[2] == '~') {
 					switch(seq[2]) {
-						// Home and end have two ways of being sent each
-						// correspondance here is awkward.
+						// Home and end have two ways of being sent each.
+						// Correspondance here is awkward but that's just
+						// how it is
 						case '1' : return HOME;
 						case '3' : return DEL;
 						case '4' : return END;
@@ -98,13 +99,7 @@ void pkey()
 	}
 }
 
-// Refresh screen with escape sequence '\x1b[2J'
-// and position the cursor at top left with 
-// sequence '\x1b[H'
-//
-// \x1b[?25l and \x1b[?25h are used to briefly
-// hide the cursor and reshow it. Used to prevent
-// flicker effect in screen repainting
+// Refresh screen
 void rfscrn()
 {
 	buffer_t buf = BUFFER_INIT; 
@@ -129,28 +124,36 @@ void rfscrn()
 void drscrn(buffer_t* buf)
 {
   	for (int i = 0; i < TERMINAL.scrrows; i++) {
-    		if(i == TERMINAL.scrrows / 10) {
-    			char* msg = calloc(64, sizeof(char));
-    			int len = snprintf(msg, 64 * sizeof(char), "Welcome to %s", VER);
+    		if(i >= TERMINAL.ctrows) {
+    			if(TERMINAL.ctrows == 0 & i == TERMINAL.scrrows / 10) {
+    				char* msg = calloc(64, sizeof(char));
+    				int len = snprintf(msg, 64 * sizeof(char), "Welcome to %s", VER);
 
+    				if(len > TERMINAL.scrcols) {
+    					len = TERMINAL.scrcols;
+    				}
+
+    				int padding = (TERMINAL.scrcols - len) >> 1;
+
+    				if(padding) {
+    					appendbuf(buf, "~", 1); 
+    					--padding;
+    				}
+
+    				while(--padding) {
+    					appendbuf(buf, " ", 1);
+    				}
+
+    				appendbuf(buf, msg, len);
+    			} else {
+    				appendbuf(buf, "~", 1);
+    			}
+    		} else {
+    			int len = TERMINAL.row.len;
     			if(len > TERMINAL.scrcols) {
     				len = TERMINAL.scrcols;
     			}
-
-    			int padding = (TERMINAL.scrcols - len) >> 1;
-
-    			if(padding) {
-    				appendbuf(buf, "~", 1); 
-    				--padding;
-    			}
-
-    			while(--padding) {
-    				appendbuf(buf, " ", 1);
-    			}
-
-    			appendbuf(buf, msg, len);
-    		} else {
-    			appendbuf(buf, "~", 1);
+    			appendbuf(buf, TERMINAL.row.chars, len);
     		}
 
     		appendbuf(buf, CLEAR_LINE, 3);
@@ -190,9 +193,6 @@ void mvcursor(int c)
 }
 
 // This function gets the position of the cursor 
-// using escape sequence '\x1b[6n in the form of
-// an escape sequence, e.g. '\x1b[24;80R' which
-// is parsed using sscanf
 int cursorpos(int* r, int* c)
 {
 	char* buf = malloc(32 * sizeof(char));
@@ -239,6 +239,35 @@ int gwsize(int* r, int* c)
 		*c = w.ws_col;
 		return 0;
 	}
+}
+
+void edopen(char* fname)
+{
+	FILE *fp = fopen(fname, "r");
+	if(!fp) {
+		kwerror("edopen");
+	}
+
+	char* line = NULL;
+	size_t lncap = 0; 
+	ssize_t lnlen;
+
+	lnlen = getline(&line, &lncap, fp);
+
+	if(lnlen != -1) {
+		while(lnlen > 0 && (line[lnlen - 1] == '\n' || line[lnlen - 1] == '\r')) {
+			--lnlen; 
+		}
+
+		TERMINAL.row.len = lnlen;
+		TERMINAL.row.chars = malloc(lnlen + 1);
+		memcpy(TERMINAL.row.chars, line, lnlen);
+		TERMINAL.row.chars[lnlen] = '\0';
+		TERMINAL.ctrows = 1;
+	}
+
+	free(line);
+	fclose(fp);
 }
 
 // Appends data to buffer and updates the buffer length
