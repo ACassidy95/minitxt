@@ -1,5 +1,9 @@
 #include "minitxt.h"
 
+/* ============================================
+	    	Input functions 
+   ===========================================*/
+
 // Waits for a single keypress and returns it
 int rkey()
 {
@@ -99,6 +103,10 @@ void pkey()
 	}
 }
 
+/* ============================================
+	    	Output functions 
+   ===========================================*/
+
 // Refresh screen
 void rfscrn()
 {
@@ -149,11 +157,11 @@ void drscrn(buffer_t* buf)
     				appendbuf(buf, "~", 1);
     			}
     		} else {
-    			int len = TERMINAL.row.len;
+    			int len = TERMINAL.row[i].len;
     			if(len > TERMINAL.scrcols) {
     				len = TERMINAL.scrcols;
     			}
-    			appendbuf(buf, TERMINAL.row.chars, len);
+    			appendbuf(buf, TERMINAL.row[i].chars, len);
     		}
 
     		appendbuf(buf, CLEAR_LINE, 3);
@@ -162,34 +170,6 @@ void drscrn(buffer_t* buf)
     			appendbuf(buf, "\r\n", 2);
     		}
   	}
-}
-
-// Moves cursor around the screen while ensuring its 
-// current coordinates don't move beyond the screen bounds
-void mvcursor(int c)
-{
-	switch(c) {
-		case UARROW:
-			if(TERMINAL.y_pos != 0) {
-				--TERMINAL.y_pos;
-			}
-			break;
-		case DARROW:
-			if(TERMINAL.y_pos != TERMINAL.scrrows - 1) {
-				++TERMINAL.y_pos;
-			}
-			break;
-		case LARROW:
-			if(TERMINAL.x_pos != 0) {
-				--TERMINAL.x_pos;
-			}
-			break;
-		case RARROW:
-			if(TERMINAL.x_pos != TERMINAL.scrcols - 1) {
-				++TERMINAL.x_pos;
-			}
-			break;
-	}
 }
 
 // This function gets the position of the cursor 
@@ -241,7 +221,39 @@ int gwsize(int* r, int* c)
 	}
 }
 
-void edopen(char* fname)
+// Moves cursor around the screen while ensuring its 
+// current coordinates don't move beyond the screen bounds
+void mvcursor(int c)
+{
+	switch(c) {
+		case UARROW:
+			if(TERMINAL.y_pos != 0) {
+				--TERMINAL.y_pos;
+			}
+			break;
+		case DARROW:
+			if(TERMINAL.y_pos != TERMINAL.scrrows - 1) {
+				++TERMINAL.y_pos;
+			}
+			break;
+		case LARROW:
+			if(TERMINAL.x_pos != 0) {
+				--TERMINAL.x_pos;
+			}
+			break;
+		case RARROW:
+			if(TERMINAL.x_pos != TERMINAL.scrcols - 1) {
+				++TERMINAL.x_pos;
+			}
+			break;
+	}
+}
+
+/* ============================================
+	    	File IO functions 
+   ===========================================*/
+
+void edopen(const char* fname)
 {
 	FILE *fp = fopen(fname, "r");
 	if(!fp) {
@@ -254,21 +266,36 @@ void edopen(char* fname)
 
 	lnlen = getline(&line, &lncap, fp);
 
-	if(lnlen != -1) {
+	while((lnlen = getline(&line, &lncap, fp)) != -1) {
 		while(lnlen > 0 && (line[lnlen - 1] == '\n' || line[lnlen - 1] == '\r')) {
-			--lnlen; 
+			lnlen--; 
 		}
-
-		TERMINAL.row.len = lnlen;
-		TERMINAL.row.chars = malloc(lnlen + 1);
-		memcpy(TERMINAL.row.chars, line, lnlen);
-		TERMINAL.row.chars[lnlen] = '\0';
-		TERMINAL.ctrows = 1;
+		edappendr(line, lnlen);
 	}
 
 	free(line);
 	fclose(fp);
 }
+
+/* ============================================
+	    	Row functions 
+   ===========================================*/
+
+void edappendr(char* s, size_t len)
+{
+	TERMINAL.row = realloc(TERMINAL.row, sizeof(edrow_t) * (TERMINAL.ctrows + 1));
+
+	int at = TERMINAL.ctrows;
+	TERMINAL.row[at].len = len; 
+	TERMINAL.row[at].chars = malloc(len + 1);
+	memcpy(TERMINAL.row[at].chars, s, len);
+	TERMINAL.row[at].chars[len] = '\0';
+	TERMINAL.ctrows++;
+}
+
+/* ============================================
+	    	Buffer functions 
+   ===========================================*/
 
 // Appends data to buffer and updates the buffer length
 void appendbuf(buffer_t* buf, const char* s, int l)

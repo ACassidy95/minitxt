@@ -5,6 +5,7 @@ void init()
 	TERMINAL.x_pos = 0;
 	TERMINAL.y_pos = 0;
 	TERMINAL.ctrows = 0; 
+	TERMINAL.row = NULL;
 	if(gwsize(&TERMINAL.scrrows, &TERMINAL.scrcols) == -1) {
 		kwerror("Init");
 	}

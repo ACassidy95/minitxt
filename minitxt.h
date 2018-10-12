@@ -45,7 +45,7 @@ typedef struct config_t {
 	int scrrows;
 	int scrcols;
 	int ctrows;
-	edrow_t row; 
+	edrow_t* row; 
 	struct termios orig_termios;
 } config_t;
 
@@ -119,7 +119,15 @@ void mvcursor(int c);
 	    	File IO functions 
    ===========================================*/
 
-void edopen(char* fname); 
+// Opens a file for reading in the editor
+void edopen(const char* fname); 
+
+/* ============================================
+	    	Row functions 
+   ===========================================*/
+
+// Appends a row from file to print to the editor
+void edappendr(char* s, size_t len);
 
 /* ============================================
 	    	Buffer functions 
