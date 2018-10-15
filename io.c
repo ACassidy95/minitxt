@@ -133,15 +133,15 @@ void drscrn(buffer_t* buf)
 {
   	for (int i = 0; i < TERMINAL.scrrows; i++) {
     		if(i >= TERMINAL.ctrows) {
-    			if(TERMINAL.ctrows == 0 & i == TERMINAL.scrrows / 10) {
+    			if(TERMINAL.ctrows == 0 && i == TERMINAL.scrrows / 10) {
     				char* msg = calloc(64, sizeof(char));
-    				int len = snprintf(msg, 64 * sizeof(char), "Welcome to %s", VER);
+    				int wlen = snprintf(msg, 64 * sizeof(char), "Welcome to %s", VER);
 
-    				if(len > TERMINAL.scrcols) {
-    					len = TERMINAL.scrcols;
+    				if(wlen > TERMINAL.scrcols) {
+    					wlen = TERMINAL.scrcols;
     				}
 
-    				int padding = (TERMINAL.scrcols - len) >> 1;
+    				int padding = (TERMINAL.scrcols - wlen) >> 1;
 
     				if(padding) {
     					appendbuf(buf, "~", 1); 
@@ -152,7 +152,7 @@ void drscrn(buffer_t* buf)
     					appendbuf(buf, " ", 1);
     				}
 
-    				appendbuf(buf, msg, len);
+    				appendbuf(buf, msg, wlen);
     			} else {
     				appendbuf(buf, "~", 1);
     			}
@@ -264,9 +264,7 @@ void edopen(const char* fname)
 	size_t lncap = 0; 
 	ssize_t lnlen;
 
-	lnlen = getline(&line, &lncap, fp);
-
-	while((lnlen = getline(&line, &lncap, fp)) != -1) {
+	while ((lnlen = getline(&line, &lncap, fp)) != -1) {
 		while(lnlen > 0 && (line[lnlen - 1] == '\n' || line[lnlen - 1] == '\r')) {
 			lnlen--; 
 		}
