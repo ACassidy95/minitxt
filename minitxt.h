@@ -56,7 +56,7 @@ typedef struct buffer_t {
 	int len; 
 } buffer_t;
 
-struct config_t TERMINAL;
+struct config_t TMNL;
 
 // Base state for a buffer is an empty string
 // with 0 length

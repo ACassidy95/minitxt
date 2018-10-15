@@ -2,13 +2,13 @@
 
 void init()
 {
-	TERMINAL.x_pos = 0;
-	TERMINAL.y_pos = 0;
-	TERMINAL.rwoffset = 0;
-	TERMINAL.coloffset = 0; 
-	TERMINAL.ctrows = 0; 
-	TERMINAL.row = NULL;
-	if(gwsize(&TERMINAL.scrrows, &TERMINAL.scrcols) == -1) {
+	TMNL.x_pos = 0;
+	TMNL.y_pos = 0;
+	TMNL.rwoffset = 0;
+	TMNL.coloffset = 0; 
+	TMNL.ctrows = 0; 
+	TMNL.row = NULL;
+	if(gwsize(&TMNL.scrrows, &TMNL.scrcols) == -1) {
 		kwerror("Init");
 	}
 }
@@ -25,7 +25,7 @@ void kwerror(const char* s)
 // return the terminal to its original state
 void drawm() 
 {
-	if(tcsetattr(STDIN_FILENO, TCSAFLUSH, &TERMINAL.orig_termios) == -1) {
+	if(tcsetattr(STDIN_FILENO, TCSAFLUSH, &TMNL.orig_termios) == -1) {
 		kwerror("tcsetattr");
 	}
 }
@@ -33,12 +33,12 @@ void drawm()
 void erawm() 
 {
 	// Set orig_termios to current settings
-	if(tcgetattr(STDIN_FILENO, &TERMINAL.orig_termios) == -1) {
+	if(tcgetattr(STDIN_FILENO, &TMNL.orig_termios) == -1) {
 		kwerror("tcgetattr");
 	}
 	atexit(drawm);
  
-	struct termios raw = TERMINAL.orig_termios;
+	struct termios raw = TMNL.orig_termios;
 
 	// Disable the following input flags
 	//	ICRNL	- disable auto conversion of \n to \r\n in input
