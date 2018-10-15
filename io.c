@@ -285,6 +285,12 @@ void mvcursor(int c)
 
 			break;
 	}
+
+	r = (TMNL.y_pos >= TMNL.ctrows) ? NULL : &TMNL.row[TMNL.y_pos];
+	int rlen = r ? r->len : 0;
+	if(TMNL.x_pos > rlen) {
+		TMNL.x_pos = rlen;
+	}
 }
 
 /* ============================================
