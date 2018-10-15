@@ -42,7 +42,8 @@ typedef struct edrow_t {
 typedef struct config_t {
 	int x_pos;
 	int y_pos;
-	int rwoffset; 
+	int rwoffset;
+	int coloffset; 
 	int scrrows;
 	int scrcols;
 	int ctrows;

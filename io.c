@@ -120,7 +120,10 @@ void rfscrn()
 	drscrn(&buf);
 
 	char c[32];
-	snprintf(c, sizeof(c), MV_CURSOR_XY, (TERMINAL.y_pos - TERMINAL.rwoffset) + 1, TERMINAL.x_pos + 1);
+	snprintf(c, sizeof(c), MV_CURSOR_XY, 
+		(TERMINAL.y_pos - TERMINAL.rwoffset) + 1, 
+		(TERMINAL.x_pos - TERMINAL.coloffset) + 1);
+	
 	appendbuf(&buf, c, strlen(c));
 
 	appendbuf(&buf, CURSOR_ON, 6);
@@ -160,11 +163,19 @@ void drscrn(buffer_t* buf)
     				appendbuf(buf, "~", 1);
     			}
     		} else {
-    			int len = TERMINAL.row[frow].len;
+    			int len = TERMINAL.row[frow].len - TERMINAL.coloffset;
+
+    			// Since the chars of each row are indexed relative to the
+    			// column offset, this ensures we never go into negative
+    			// cursor positions
+    			if(len < 0) {
+    				len = 0;
+    			}
+
     			if(len > TERMINAL.scrcols) {
     				len = TERMINAL.scrcols;
     			}
-    			appendbuf(buf, TERMINAL.row[frow].chars, len);
+    			appendbuf(buf, &TERMINAL.row[frow].chars[TERMINAL.coloffset], len);
     		}
 
     		appendbuf(buf, CLEAR_LINE, 3);
@@ -175,9 +186,8 @@ void drscrn(buffer_t* buf)
   	}
 }
 
-// If the cursor is above the window we scroll to it.
-// Same for the bottom but this involves the count of
-// rows since rwoffset refers to the top of the screen
+// Allows the user to scroll through a file by moving the
+// cursor around the screen horizontally and vertically
 void edscroll() 
 {
 	if(TERMINAL.y_pos < TERMINAL.rwoffset) {
@@ -186,6 +196,14 @@ void edscroll()
 
 	if(TERMINAL.y_pos >= TERMINAL.rwoffset + TERMINAL.scrrows) {
 		TERMINAL.rwoffset = TERMINAL.y_pos - TERMINAL.scrrows + 1;
+	}
+
+	if(TERMINAL.x_pos < TERMINAL.coloffset) {
+		TERMINAL.coloffset = TERMINAL.x_pos;
+	}
+
+	if(TERMINAL.x_pos >= TERMINAL.coloffset + TERMINAL.scrcols) {
+		TERMINAL.coloffset = TERMINAL.x_pos - TERMINAL.scrcols + 1;
 	}
 }
 
@@ -259,9 +277,8 @@ void mvcursor(int c)
 			}
 			break;
 		case RARROW:
-			if(TERMINAL.x_pos != TERMINAL.scrcols - 1) {
-				++TERMINAL.x_pos;
-			}
+			// Allows horizontal scrolling
+			++TERMINAL.x_pos;
 			break;
 	}
 }
