@@ -79,15 +79,15 @@ void pkey()
 			break;
 
 		case HOME:
-			TERMINAL.x_pos = 0;
+			TMNL.x_pos = 0;
 			break;
 		case END:
-			TERMINAL.x_pos = TERMINAL.scrcols - 1; 
+			TMNL.x_pos = TMNL.scrcols - 1; 
 
 		case PGUP:
 		case PGDN:
 			{
-				int times = TERMINAL.scrrows - 1;
+				int times = TMNL.scrrows - 1;
 				while(--times) {
 					mvcursor(c == PGUP ? UARROW : DARROW);
 				}
@@ -121,9 +121,9 @@ void rfscrn()
 
 	char c[32];
 	snprintf(c, sizeof(c), MV_CURSOR_XY, 
-		(TERMINAL.y_pos - TERMINAL.rwoffset) + 1, 
-		(TERMINAL.x_pos - TERMINAL.coloffset) + 1);
-	
+		(TMNL.y_pos - TMNL.rwoffset) + 1, 
+		(TMNL.x_pos - TMNL.coloffset) + 1);
+
 	appendbuf(&buf, c, strlen(c));
 
 	appendbuf(&buf, CURSOR_ON, 6);
@@ -136,18 +136,18 @@ void rfscrn()
 // reposition cursor back at the top of the screen
 void drscrn(buffer_t* buf)
 {
-  	for (int i = 0; i < TERMINAL.scrrows; i++) {
-  		int frow = TERMINAL.rwoffset + i;
-    		if(frow >= TERMINAL.ctrows) {
-    			if(TERMINAL.ctrows == 0 && i == TERMINAL.scrrows / 2) {
+  	for (int i = 0; i < TMNL.scrrows; i++) {
+  		int frow = TMNL.rwoffset + i;
+    		if(frow >= TMNL.ctrows) {
+    			if(TMNL.ctrows == 0 && i == TMNL.scrrows / 2) {
     				char* msg = calloc(32, sizeof(char));
     				int wlen = snprintf(msg, 32, WELCOME);
 
-    				if(wlen > TERMINAL.scrcols) {
-    					wlen = TERMINAL.scrcols;
+    				if(wlen > TMNL.scrcols) {
+    					wlen = TMNL.scrcols;
     				}
 
-    				int padding = (TERMINAL.scrcols - wlen) >> 1;
+    				int padding = (TMNL.scrcols - wlen) >> 1;
 
     				if(padding) {
     					appendbuf(buf, "~", 1); 
@@ -163,7 +163,7 @@ void drscrn(buffer_t* buf)
     				appendbuf(buf, "~", 1);
     			}
     		} else {
-    			int len = TERMINAL.row[frow].len - TERMINAL.coloffset;
+    			int len = TMNL.row[frow].len - TMNL.coloffset;
 
     			// Since the chars of each row are indexed relative to the
     			// column offset, this ensures we never go into negative
@@ -172,15 +172,15 @@ void drscrn(buffer_t* buf)
     				len = 0;
     			}
 
-    			if(len > TERMINAL.scrcols) {
-    				len = TERMINAL.scrcols;
+    			if(len > TMNL.scrcols) {
+    				len = TMNL.scrcols;
     			}
-    			appendbuf(buf, &TERMINAL.row[frow].chars[TERMINAL.coloffset], len);
+    			appendbuf(buf, &TMNL.row[frow].chars[TMNL.coloffset], len);
     		}
 
     		appendbuf(buf, CLEAR_LINE, 3);
 
-    		if(i < TERMINAL.scrrows - 1) {
+    		if(i < TMNL.scrrows - 1) {
     			appendbuf(buf, "\r\n", 2);
     		}
   	}
@@ -190,20 +190,20 @@ void drscrn(buffer_t* buf)
 // cursor around the screen horizontally and vertically
 void edscroll() 
 {
-	if(TERMINAL.y_pos < TERMINAL.rwoffset) {
-		TERMINAL.rwoffset = TERMINAL.y_pos;
+	if(TMNL.y_pos < TMNL.rwoffset) {
+		TMNL.rwoffset = TMNL.y_pos;
 	}
 
-	if(TERMINAL.y_pos >= TERMINAL.rwoffset + TERMINAL.scrrows) {
-		TERMINAL.rwoffset = TERMINAL.y_pos - TERMINAL.scrrows + 1;
+	if(TMNL.y_pos >= TMNL.rwoffset + TMNL.scrrows) {
+		TMNL.rwoffset = TMNL.y_pos - TMNL.scrrows + 1;
 	}
 
-	if(TERMINAL.x_pos < TERMINAL.coloffset) {
-		TERMINAL.coloffset = TERMINAL.x_pos;
+	if(TMNL.x_pos < TMNL.coloffset) {
+		TMNL.coloffset = TMNL.x_pos;
 	}
 
-	if(TERMINAL.x_pos >= TERMINAL.coloffset + TERMINAL.scrcols) {
-		TERMINAL.coloffset = TERMINAL.x_pos - TERMINAL.scrcols + 1;
+	if(TMNL.x_pos >= TMNL.coloffset + TMNL.scrcols) {
+		TMNL.coloffset = TMNL.x_pos - TMNL.scrcols + 1;
 	}
 }
 
@@ -260,25 +260,29 @@ int gwsize(int* r, int* c)
 // current coordinates don't move beyond the screen bounds
 void mvcursor(int c)
 {
+	edrow_t* r = (TMNL.y_pos >= TMNL.ctrows) ? NULL : &TMNL.row[TMNL.y_pos];
+
 	switch(c) {
 		case UARROW:
-			if(TERMINAL.y_pos != 0) {
-				--TERMINAL.y_pos;
+			if(TMNL.y_pos != 0) {
+				--TMNL.y_pos;
 			}
 			break;
 		case DARROW:
-			if(TERMINAL.y_pos < TERMINAL.ctrows) {
-				++TERMINAL.y_pos;
+			if(TMNL.y_pos < TMNL.ctrows) {
+				++TMNL.y_pos;
 			}
 			break;
 		case LARROW:
-			if(TERMINAL.x_pos != 0) {
-				--TERMINAL.x_pos;
+			if(TMNL.x_pos != 0) {
+				--TMNL.x_pos;
 			}
 			break;
 		case RARROW:
-			// Allows horizontal scrolling
-			++TERMINAL.x_pos;
+			if(r && TMNL.x_pos < r->len) {
+				++TMNL.x_pos;
+			}
+
 			break;
 	}
 }
@@ -315,14 +319,14 @@ void edopen(const char* fname)
 
 void edappendr(char* s, size_t len)
 {
-	TERMINAL.row = realloc(TERMINAL.row, sizeof(edrow_t) * (TERMINAL.ctrows + 1));
+	TMNL.row = realloc(TMNL.row, sizeof(edrow_t) * (TMNL.ctrows + 1));
 
-	int at = TERMINAL.ctrows;
-	TERMINAL.row[at].len = len; 
-	TERMINAL.row[at].chars = malloc(len + 1);
-	memcpy(TERMINAL.row[at].chars, s, len);
-	TERMINAL.row[at].chars[len] = '\0';
-	TERMINAL.ctrows++;
+	int at = TMNL.ctrows;
+	TMNL.row[at].len = len; 
+	TMNL.row[at].chars = malloc(len + 1);
+	memcpy(TMNL.row[at].chars, s, len);
+	TMNL.row[at].chars[len] = '\0';
+	TMNL.ctrows++;
 }
 
 /* ============================================
