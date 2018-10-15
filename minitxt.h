@@ -18,7 +18,7 @@
 // Used for detecting ctrl+ key combinations
 #define CTRL_K(k) 	((k) & 0x1f)
 
-#define VER 		"MiniTxt Version 0.0.1"
+#define WELCOME 	"Welcome to MiniTxt ver 0.0.1"
 
 #define CURSOR_OFF 	"\x1b[?25l"
 #define CURSOR_ON 	"\x1b[?25h"
@@ -42,6 +42,7 @@ typedef struct edrow_t {
 typedef struct config_t {
 	int x_pos;
 	int y_pos;
+	int rwoffset; 
 	int scrrows;
 	int scrcols;
 	int ctrows;
@@ -109,6 +110,9 @@ void rfscrn();
 
 // draw a vim-like column of tildes on the screen
 void drscrn(buffer_t* buf);
+
+// Allows the user to scroll through a file
+void edscroll();
 
 // get window information
 int gwsize(int* r, int* c);

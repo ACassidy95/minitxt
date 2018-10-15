@@ -110,6 +110,8 @@ void pkey()
 // Refresh screen
 void rfscrn()
 {
+	edscroll();
+
 	buffer_t buf = BUFFER_INIT; 
 
 	appendbuf(&buf, CURSOR_OFF, 6);
@@ -118,7 +120,7 @@ void rfscrn()
 	drscrn(&buf);
 
 	char c[32];
-	snprintf(c, sizeof(c), MV_CURSOR_XY, TERMINAL.y_pos + 1, TERMINAL.x_pos + 1);
+	snprintf(c, sizeof(c), MV_CURSOR_XY, (TERMINAL.y_pos - TERMINAL.rwoffset) + 1, TERMINAL.x_pos + 1);
 	appendbuf(&buf, c, strlen(c));
 
 	appendbuf(&buf, CURSOR_ON, 6);
@@ -132,10 +134,11 @@ void rfscrn()
 void drscrn(buffer_t* buf)
 {
   	for (int i = 0; i < TERMINAL.scrrows; i++) {
-    		if(i >= TERMINAL.ctrows) {
-    			if(TERMINAL.ctrows == 0 && i == TERMINAL.scrrows / 10) {
-    				char* msg = calloc(64, sizeof(char));
-    				int wlen = snprintf(msg, 64 * sizeof(char), "Welcome to %s", VER);
+  		int frow = TERMINAL.rwoffset + i;
+    		if(frow >= TERMINAL.ctrows) {
+    			if(TERMINAL.ctrows == 0 && i == TERMINAL.scrrows / 2) {
+    				char* msg = calloc(32, sizeof(char));
+    				int wlen = snprintf(msg, 32, WELCOME);
 
     				if(wlen > TERMINAL.scrcols) {
     					wlen = TERMINAL.scrcols;
@@ -157,11 +160,11 @@ void drscrn(buffer_t* buf)
     				appendbuf(buf, "~", 1);
     			}
     		} else {
-    			int len = TERMINAL.row[i].len;
+    			int len = TERMINAL.row[frow].len;
     			if(len > TERMINAL.scrcols) {
     				len = TERMINAL.scrcols;
     			}
-    			appendbuf(buf, TERMINAL.row[i].chars, len);
+    			appendbuf(buf, TERMINAL.row[frow].chars, len);
     		}
 
     		appendbuf(buf, CLEAR_LINE, 3);
@@ -170,6 +173,20 @@ void drscrn(buffer_t* buf)
     			appendbuf(buf, "\r\n", 2);
     		}
   	}
+}
+
+// If the cursor is above the window we scroll to it.
+// Same for the bottom but this involves the count of
+// rows since rwoffset refers to the top of the screen
+void edscroll() 
+{
+	if(TERMINAL.y_pos < TERMINAL.rwoffset) {
+		TERMINAL.rwoffset = TERMINAL.y_pos;
+	}
+
+	if(TERMINAL.y_pos >= TERMINAL.rwoffset + TERMINAL.scrrows) {
+		TERMINAL.rwoffset = TERMINAL.y_pos - TERMINAL.scrrows + 1;
+	}
 }
 
 // This function gets the position of the cursor 
@@ -232,7 +249,7 @@ void mvcursor(int c)
 			}
 			break;
 		case DARROW:
-			if(TERMINAL.y_pos != TERMINAL.scrrows - 1) {
+			if(TERMINAL.y_pos < TERMINAL.ctrows) {
 				++TERMINAL.y_pos;
 			}
 			break;
