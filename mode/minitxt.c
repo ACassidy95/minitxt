@@ -1,5 +1,5 @@
-//#include "../include/define.h"
-//#include "../include/funcs.h"
+#include "../include/define.h"
+#include "../include/funcs.h"
 
 int main(int argc, char const **argv)
 {
