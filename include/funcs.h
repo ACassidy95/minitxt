@@ -1,0 +1,76 @@
+#ifndef _FUNCS_H_
+#define _FUNCS_H_
+
+void init();
+
+/* ============================================
+	    Terminal mode functions 
+   ===========================================*/
+
+// kill with error - takes in an error
+// string and prints it to stdout and exits
+void kwerror(const char* s);
+
+// disable raw mode - return terminal to
+// canonical mode on termination
+void drawm();
+
+// enable raw mode - change terminal to
+// raw mode from canonical mode
+void erawm();
+
+/* ============================================
+	    	Input functions 
+   ===========================================*/
+
+// read key & process key - read a key 
+// press and decide how to respond
+int rkey();
+void pkey();
+
+/* ============================================
+	    	Output functions 
+   ===========================================*/
+
+// refreshes the screen
+void rfscrn();
+
+// draw a vim-like column of tildes on the screen
+void drscrn(buffer_t* buf);
+
+// Allows the user to scroll through a file
+void edscroll();
+
+// get window information
+int gwsize(int* r, int* c);
+int cursorpos(int* r, int* c);
+void mvcursor(int c);
+
+/* ============================================
+	    	File IO functions 
+   ===========================================*/
+
+// Opens a file for reading in the editor
+void edopen(const char* fname); 
+
+/* ============================================
+	    	Row functions 
+   ===========================================*/
+
+// Appends a row from file to print to the editor
+void edappendr(char* s, size_t len);
+
+// Updates a row with characters to be rendered to the screen
+void edupdater(edrow_t* r);
+
+/* ============================================
+	    	Buffer functions 
+   ===========================================*/
+
+// adds string data of length l to an existing buffer
+void appendbuf(buffer_t* buf, const char* s, int l);
+
+// frees a buffer
+void freebuf(buffer_t* buf); 
+
+#endif
