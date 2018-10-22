@@ -17,6 +17,7 @@ void edappendr(char* s, size_t len)
 
 	TMNL.row[at].render = 0;
 	TMNL.row[at].rendernp = NULL;
+
 	edupdater(&TMNL.row[at]);
 
 	TMNL.ctrows++;
@@ -24,16 +25,47 @@ void edappendr(char* s, size_t len)
 
 void edupdater(edrow_t* r)
 {
-	free(r->rendernp);
-	r->rendernp = malloc(r->len + 1);
+	int tabs = 0; 
+	int j; 
 
-	int j;
 	for(j = 0; j < r->len; ++j) {
-		r->rendernp[j + 1] = r->chars[j];
+		if(r->chars[j] == '\t') {
+			++tabs; 
+		}
 	}
 
-	r->rendernp[j] = '\0';
-	r->render = j;
+	free(r->rendernp);
+	r->rendernp = malloc(r->len + tabs * (TAB_STOP - 1) + 1);
+
+	int idx = 0; 
+
+	for(j = 0; j < r->len; ++j) {
+		if(r->chars[j] == '\t') {
+			r->rendernp[idx++] = ' ';
+			while(idx % TAB_STOP != 0) {
+				r->rendernp[idx++] = ' ';
+			}
+		} else {
+			r->rendernp[idx++] = r->chars[j];
+		}
+	}
+
+	r->rendernp[idx] = '\0';
+	r->render = idx;
+}
+
+int indexrender(edrow_t* r, int cx)
+{
+	int rx = 0; 
+	
+	for(int j = 0; j < cx; j++) {
+		if(r->chars[j] == '\t') {
+			rx += (TAB_STOP - 1) - (rx % TAB_STOP);
+		}
+		++rx;
+	}
+
+	return rx;
 }
 
 /* ============================================

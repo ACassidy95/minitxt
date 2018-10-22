@@ -20,7 +20,7 @@ void rfscrn()
 	char c[32];
 	snprintf(c, sizeof(c), MV_CURSOR_XY, 
 		(TMNL.y_pos - TMNL.rwoffset) + 1, 
-		(TMNL.x_pos - TMNL.coloffset) + 1);
+		(TMNL.render_x - TMNL.coloffset) + 1);
 
 	appendbuf(&buf, c, strlen(c));
 
@@ -88,6 +88,12 @@ void drscrn(buffer_t* buf)
 // cursor around the screen horizontally and vertically
 void edscroll() 
 {
+	TMNL.render_x = 0;
+
+	if(TMNL.y_pos < TMNL.ctrows) {
+		TMNL.render_x = indexrender(&TMNL.row[TMNL.y_pos], TMNL.x_pos);
+	}
+
 	if(TMNL.y_pos < TMNL.rwoffset) {
 		TMNL.rwoffset = TMNL.y_pos;
 	}
@@ -96,12 +102,12 @@ void edscroll()
 		TMNL.rwoffset = TMNL.y_pos - TMNL.scrrows + 1;
 	}
 
-	if(TMNL.x_pos < TMNL.coloffset) {
-		TMNL.coloffset = TMNL.x_pos;
+	if(TMNL.render_x < TMNL.coloffset) {
+		TMNL.coloffset = TMNL.render_x;
 	}
 
-	if(TMNL.x_pos >= TMNL.coloffset + TMNL.scrcols) {
-		TMNL.coloffset = TMNL.x_pos - TMNL.scrcols + 1;
+	if(TMNL.render_x >= TMNL.coloffset + TMNL.scrcols) {
+		TMNL.coloffset = TMNL.render_x - TMNL.scrcols + 1;
 	}
 }
 
@@ -146,7 +152,7 @@ int gwsize(int* r, int* c)
 		if(write(STDOUT_FILENO, MV_CURSOR_MAX, 12) != 12) {
 			return -1;
 		}
-		return cursorpos(&r, &c);
+		return cursorpos(r, c);
 	} else {
 		*r = w.ws_row;
 		*c = w.ws_col;

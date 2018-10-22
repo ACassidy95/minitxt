@@ -5,6 +5,7 @@ void init()
 {
 	TMNL.x_pos = 0;
 	TMNL.y_pos = 0;
+	TMNL.render_x = 0;
 	TMNL.rwoffset = 0;
 	TMNL.coloffset = 0; 
 	TMNL.ctrows = 0; 

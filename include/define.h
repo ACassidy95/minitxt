@@ -20,6 +20,8 @@
 
 #define WELCOME 	"Welcome to MiniTxt ver 0.0.1"
 
+#define TAB_STOP	8
+
 #define CURSOR_OFF 	"\x1b[?25l"
 #define CURSOR_ON 	"\x1b[?25h"
 #define CURSOR_POS	"\x1b[6n"
@@ -44,6 +46,7 @@ typedef struct edrow_t {
 typedef struct config_t {
 	int x_pos;
 	int y_pos;
+	int render_x;
 	int rwoffset;
 	int coloffset; 
 	int scrrows;

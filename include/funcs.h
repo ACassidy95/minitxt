@@ -63,6 +63,9 @@ void edappendr(char* s, size_t len);
 // Updates a row with characters to be rendered to the screen
 void edupdater(edrow_t* r);
 
+// Convert actual index to render index
+int indexrender(edrow_t* r, int cx);
+
 /* ============================================
 	    	Buffer functions 
    ===========================================*/
