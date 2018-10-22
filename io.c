@@ -276,16 +276,25 @@ void mvcursor(int c)
 		case LARROW:
 			if(TMNL.x_pos != 0) {
 				--TMNL.x_pos;
+			} else if(TMNL.y_pos > 0) {
+				// Snap cursor to end of prev line if user hits left at line start
+				TMNL.y_pos--;
+				TMNL.x_pos = TMNL.row[TMNL.y_pos].len;
 			}
 			break;
 		case RARROW:
 			if(r && TMNL.x_pos < r->len) {
 				++TMNL.x_pos;
+			} else if(r && TMNL.x_pos == r->len) {
+				// Snap cursor to start of next line if user hits right at line end
+				++TMNL.y_pos;
+				TMNL.x_pos = 0;
 			}
-
 			break;
 	}
 
+	// Snap the cursor back to the end of the current row
+	// if scrolling from a longer one
 	r = (TMNL.y_pos >= TMNL.ctrows) ? NULL : &TMNL.row[TMNL.y_pos];
 	int rlen = r ? r->len : 0;
 	if(TMNL.x_pos > rlen) {
