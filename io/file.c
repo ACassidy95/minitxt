@@ -7,6 +7,9 @@
 
 void edopen(const char* fname)
 {
+	free(TMNL.filen);
+	TMNL.filen = strdup(fname);
+
 	FILE *fp = fopen(fname, "r");
 	if(!fp) {
 		kwerror("edopen");

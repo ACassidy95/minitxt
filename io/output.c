@@ -16,6 +16,7 @@ void rfscrn()
 	appendbuf(&buf, MV_CURSOR_00, 3);
 
 	drscrn(&buf);
+	drstat(&buf);
 
 	char c[32];
 	snprintf(c, sizeof(c), MV_CURSOR_XY, 
@@ -77,10 +78,7 @@ void drscrn(buffer_t* buf)
     		}
 
     		appendbuf(buf, CLEAR_LINE, 3);
-
-    		if(i < TMNL.scrrows - 1) {
-    			appendbuf(buf, "\r\n", 2);
-    		}
+		appendbuf(buf, "\r\n", 2);
   	}
 }
 
@@ -138,6 +136,18 @@ int cursorpos(int* r, int* c)
   	}
 
   	return 0;
+}
+void drstat(buffer_t* buf)
+{
+	appendbuf(buf, STYLE_STATUS, 6);
+	int len = 0; 
+
+	while(len < TMNL.scrcols) {
+		appendbuf(buf, " ", 1);
+		++len;
+	}
+
+	appendbuf(buf, CLEAR_STYLE, 3);
 }
 
 // Attempts to get window size using definitions in

@@ -10,9 +10,13 @@ void init()
 	TMNL.coloffset = 0; 
 	TMNL.ctrows = 0; 
 	TMNL.row = NULL;
+	TMNL.filen = NULL;
+
 	if(gwsize(&TMNL.scrrows, &TMNL.scrcols) == -1) {
 		kwerror("Init");
 	}
+
+	TMNL.scrrows -= 1;
 }
 
 // Error handling mode

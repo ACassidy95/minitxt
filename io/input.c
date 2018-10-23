@@ -83,11 +83,23 @@ void pkey()
 			TMNL.x_pos = 0;
 			break;
 		case END:
-			TMNL.x_pos = TMNL.scrcols - 1; 
+			if(TMNL.y_pos < TMNL.ctrows) {
+				TMNL.x_pos = TMNL.row[TMNL.y_pos].len;
+			}
+			break;
 
 		case PGUP:
 		case PGDN:
 			{
+				if(c == PGUP) {
+					TMNL.y_pos = TMNL.rwoffset;
+				} else if(c == PGDN) {
+					TMNL.y_pos = TMNL.rwoffset + TMNL.ctrows - 1;
+					if(TMNL.y_pos > TMNL.ctrows) {
+						TMNL.y_pos = TMNL.ctrows;
+					}
+				}
+
 				int times = TMNL.scrrows - 1;
 				while(--times) {
 					mvcursor(c == PGUP ? UARROW : DARROW);

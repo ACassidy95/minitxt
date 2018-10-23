@@ -41,6 +41,9 @@ void drscrn(buffer_t* buf);
 // Allows the user to scroll through a file
 void edscroll();
 
+// Draws the status bar at the bottom of the screen
+void drstat(buffer_t* buf);
+
 // get window information
 int gwsize(int* r, int* c);
 int cursorpos(int* r, int* c);

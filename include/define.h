@@ -30,6 +30,8 @@
 #define MV_CURSOR_MAX	"\x1b[999C\x1b[999B"
 #define CLEAR_SCREEN	"\x1b[2J"
 #define CLEAR_LINE	"\x1b[K"
+#define STYLE_STATUS	"\x1b[1;7m"
+#define CLEAR_STYLE	"\x1b[m"
 
 
 // Defines a row in the editor
@@ -52,7 +54,8 @@ typedef struct config_t {
 	int scrrows;
 	int scrcols;
 	int ctrows;
-	edrow_t* row; 
+	edrow_t* row;
+	char* filen; 
 	struct termios orig_termios;
 } config_t;
 
