@@ -11,12 +11,16 @@ void init()
 	TMNL.ctrows = 0; 
 	TMNL.row = NULL;
 	TMNL.filen = NULL;
+	TMNL.stmsg[0] = '\0';
+	TMNL.sttime = 0;
 
 	if(gwsize(&TMNL.scrrows, &TMNL.scrcols) == -1) {
 		kwerror("Init");
 	}
 
-	TMNL.scrrows -= 1;
+	// Two rows allocated at base of screen for status
+	// bar and message bar
+	TMNL.scrrows -= 2;
 }
 
 // Error handling mode

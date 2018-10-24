@@ -7,10 +7,12 @@
 
 #include <ctype.h>
 #include <errno.h>
+#include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <termios.h>
+#include <time.h>
 #include <unistd.h>
 #include <sys/ioctl.h>
 #include <sys/types.h>
@@ -56,6 +58,8 @@ typedef struct config_t {
 	int ctrows;
 	edrow_t* row;
 	char* filen; 
+	char stmsg[80]; // Stats message - fixed size
+	time_t sttime; 
 	struct termios orig_termios;
 } config_t;
 

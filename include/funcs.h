@@ -44,6 +44,12 @@ void edscroll();
 // Draws the status bar at the bottom of the screen
 void drstat(buffer_t* buf);
 
+// Draws the message bar at the bottom of the screen
+void drmsg(buffer_t* buf);
+
+// Used to print the status message on the status bar
+void edstatmsg(const char* fmt, ...);
+
 // get window information
 int gwsize(int* r, int* c);
 int cursorpos(int* r, int* c);

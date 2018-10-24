@@ -10,6 +10,8 @@ int main(int argc, char const **argv)
 		edopen(argv[1]);
 	}
 
+	edstatmsg("HELP: Ctrl-q = quit");
+
 	while(1) {
 		rfscrn();
 		pkey();

@@ -15,8 +15,12 @@ void rfscrn()
 	appendbuf(&buf, CURSOR_OFF, 6);
 	appendbuf(&buf, MV_CURSOR_00, 3);
 
+	// Screen drawing functionality
+	// Prints the screen format, status bar
+	// and message bar in the terminal window
 	drscrn(&buf);
 	drstat(&buf);
+	drmsg(&buf);
 
 	char c[32];
 	snprintf(c, sizeof(c), MV_CURSOR_XY, 
@@ -137,6 +141,7 @@ int cursorpos(int* r, int* c)
 
   	return 0;
 }
+
 void drstat(buffer_t* buf)
 {
 	appendbuf(buf, STYLE_STATUS, 6);
@@ -165,6 +170,30 @@ void drstat(buffer_t* buf)
 	}
 
 	appendbuf(buf, CLEAR_STYLE, 3);
+	appendbuf(buf, "\r\n", 2); // Makes an extra line for the status message
+}
+
+void drmsg(buffer_t* buf)
+{
+	appendbuf(buf, STYLE_STATUS, 6);
+	int len = strlen(TMNL.stmsg);
+	if(len > TMNL.scrcols) {
+		len = TMNL.scrcols;
+	}
+
+	if(len && time(NULL) - TMNL.sttime < 5) {
+		appendbuf(buf, TMNL.stmsg, len);
+	}
+	appendbuf(buf, CLEAR_STYLE, 3);
+}
+
+void edstatmsg(const char* fmt, ...)
+{
+	va_list ap;
+	va_start(ap, fmt);
+	vsnprintf(TMNL.stmsg, sizeof(TMNL.stmsg), fmt, ap);
+	va_end(ap);
+	TMNL.sttime = time(NULL);
 }
 
 // Attempts to get window size using definitions in
