@@ -140,7 +140,15 @@ int cursorpos(int* r, int* c)
 void drstat(buffer_t* buf)
 {
 	appendbuf(buf, STYLE_STATUS, 6);
-	int len = 0; 
+	char status[80];
+
+	int len = snprintf(status, sizeof(status), "%.20s - %d lines", TMNL.filen ? TMNL.filen : "~~~No File~~~", TMNL.ctrows);
+
+	if(len > TMNL.scrcols) {
+		len = TMNL.scrcols;
+	}
+
+	appendbuf(buf, status, len);
 
 	while(len < TMNL.scrcols) {
 		appendbuf(buf, " ", 1);
