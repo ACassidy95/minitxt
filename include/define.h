@@ -20,7 +20,7 @@
 // Used for detecting ctrl+ key combinations
 #define CTRL_K(k) 	((k) & 0x1f)
 
-#define WELCOME 	"Welcome to MiniTxt ver 0.0.1"
+#define WELCOME 	"Welcome to MiniTxt ver 0.0.1 - Press Ctrl-H for help"
 
 #define TAB_STOP	8
 

@@ -10,7 +10,7 @@ int main(int argc, char const **argv)
 		edopen(argv[1]);
 	}
 
-	edstatmsg("HELP: Ctrl-q = quit");
+	edstatmsg(WELCOME);
 
 	while(1) {
 		rfscrn();

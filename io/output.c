@@ -42,29 +42,7 @@ void drscrn(buffer_t* buf)
   	for (int i = 0; i < TMNL.scrrows; i++) {
   		int frow = TMNL.rwoffset + i;
     		if(frow >= TMNL.ctrows) {
-    			if(TMNL.ctrows == 0 && i == TMNL.scrrows / 2) {
-    				char* msg = calloc(32, sizeof(char));
-    				int wlen = snprintf(msg, 32, WELCOME);
-
-    				if(wlen > TMNL.scrcols) {
-    					wlen = TMNL.scrcols;
-    				}
-
-    				int padding = (TMNL.scrcols - wlen) >> 1;
-
-    				if(padding) {
-    					appendbuf(buf, "~", 1); 
-    					--padding;
-    				}
-
-    				while(--padding) {
-    					appendbuf(buf, " ", 1);
-    				}
-
-    				appendbuf(buf, msg, wlen);
-    			} else {
-    				appendbuf(buf, "~", 1);
-    			}
+    			appendbuf(buf, "~", 1);
     		} else {
     			int len = TMNL.row[frow].render - TMNL.coloffset;
 

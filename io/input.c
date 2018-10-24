@@ -79,6 +79,10 @@ void pkey()
 			exit(0);
 			break;
 
+		case CTRL_K('h'):
+			edstatmsg("Ctrl-Q - quit | ");
+			break;
+
 		case HOME:
 			TMNL.x_pos = 0;
 			break;
