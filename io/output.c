@@ -140,9 +140,13 @@ int cursorpos(int* r, int* c)
 void drstat(buffer_t* buf)
 {
 	appendbuf(buf, STYLE_STATUS, 6);
-	char status[80];
+	char status[80], place[80];
 
-	int len = snprintf(status, sizeof(status), "%.20s - %d lines", TMNL.filen ? TMNL.filen : "~~~No File~~~", TMNL.ctrows);
+	// Displays filename and line count or No File depending on whether or not somehting is open
+	int len = snprintf(status, sizeof(status), "%.20s - %d lines", TMNL.filen ? TMNL.filen : "No File", TMNL.ctrows);
+
+	// Displays current line and column
+	int plen = snprintf(place, sizeof(place), "Line : %d | Column : %d", TMNL.y_pos + 1, TMNL.x_pos);
 
 	if(len > TMNL.scrcols) {
 		len = TMNL.scrcols;
@@ -151,8 +155,13 @@ void drstat(buffer_t* buf)
 	appendbuf(buf, status, len);
 
 	while(len < TMNL.scrcols) {
-		appendbuf(buf, " ", 1);
-		++len;
+		if(TMNL.scrcols - len == plen){
+			appendbuf(buf, place, plen);
+			break;
+		} else {
+			appendbuf(buf, " ", 1);
+			++len;
+		}
 	}
 
 	appendbuf(buf, CLEAR_STYLE, 3);
