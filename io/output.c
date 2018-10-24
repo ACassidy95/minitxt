@@ -175,8 +175,10 @@ void drstat(buffer_t* buf)
 
 void drmsg(buffer_t* buf)
 {
+	appendbuf(buf, CLEAR_LINE, 3);
 	appendbuf(buf, STYLE_STATUS, 6);
 	int len = strlen(TMNL.stmsg);
+
 	if(len > TMNL.scrcols) {
 		len = TMNL.scrcols;
 	}
@@ -184,6 +186,7 @@ void drmsg(buffer_t* buf)
 	if(len && time(NULL) - TMNL.sttime < 5) {
 		appendbuf(buf, TMNL.stmsg, len);
 	}
+
 	appendbuf(buf, CLEAR_STYLE, 3);
 }
 
