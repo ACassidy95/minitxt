@@ -54,6 +54,30 @@ void edupdater(edrow_t* r)
 	r->render = idx;
 }
 
+void insertchar(edrow_t* r, int idx, int c)
+{
+	if(idx < 0 || idx > r->len) {
+		idx = r->len;
+	}
+	r->chars = realloc(r->chars, r->len + 2); // add 2 to make room for '\0'
+	memmove(&r->chars[idx + 1], &r->chars[idx], r->len - idx + 1);
+	++r->len; 
+	r->chars[idx] = c; 
+	edupdater(r);
+}
+
+// Appends a new row to the file if it's at the last one
+// then inserts the characters and bumps the cursor along one space
+void edinsertchar(int c)
+{
+	if(TMNL.y_pos == TMNL.ctrows) {
+		edappendr("", 0); 
+
+	}
+	insertchar(&TMNL.row[TMNL.y_pos], TMNL.x_pos, c);
+	++TMNL.x_pos;
+}
+
 int indexrender(edrow_t* r, int cx)
 {
 	int rx = 0; 

@@ -117,5 +117,20 @@ void pkey()
 		case RARROW:
 			mvcursor(c);
 			break;
+		default:
+			edinsertchar(c);
+			break;
 	}
 }
+
+
+
+
+
+
+
+
+
+
+
+

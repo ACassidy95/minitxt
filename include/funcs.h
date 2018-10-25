@@ -72,6 +72,11 @@ void edappendr(char* s, size_t len);
 // Updates a row with characters to be rendered to the screen
 void edupdater(edrow_t* r);
 
+// Used to insert text to a row and update the editor with
+// the inseted text
+void insertchar(edrow_t* r, int idx, int c);
+void edinsertchar(int c);
+
 // Convert actual index to render index
 int indexrender(edrow_t* r, int cx);
 
