@@ -62,6 +62,12 @@ void mvcursor(int c);
 // Opens a file for reading in the editor
 void edopen(const char* fname); 
 
+// Saves each edrow_t as a string to be written to disk
+char* edrtos(int* len);
+
+// Saves changes to file
+void edsave();
+
 /* ============================================
 	    	Row functions 
    ===========================================*/

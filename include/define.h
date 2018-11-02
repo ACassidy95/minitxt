@@ -7,6 +7,7 @@
 
 #include <ctype.h>
 #include <errno.h>
+#include <fcntl.h>
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -20,7 +21,7 @@
 // Used for detecting ctrl+ key combinations
 #define CTRL_K(k) 	((k) & 0x1f)
 
-#define WELCOME 	"Welcome to MiniTxt ver 0.0.1 - Press Ctrl-H for help"
+#define WELCOME 	"Welcome to MiniTxt - Press Ctrl-H for help"
 
 #define TAB_STOP	8
 
@@ -76,6 +77,7 @@ struct config_t TMNL;
 
 // Key mappings
 enum keys {
+	BSPACE = 127,
 	UARROW = 1000,
 	DARROW,
 	LARROW,

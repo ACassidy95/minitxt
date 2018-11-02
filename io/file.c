@@ -29,3 +29,43 @@ void edopen(const char* fname)
 	free(line);
 	fclose(fp);
 }
+
+char* edrtos(int* len)
+{
+	int total_len = 0;
+
+	for(int i = 0; i < TMNL.ctrows; ++i) {
+		total_len += TMNL.row[i].len + 1;
+	}
+
+	*len = total_len;
+
+	char* buffer = malloc(total_len);
+	char* j = buffer;
+
+	for(int i = 0; i < TMNL.ctrows; ++i) {
+		memcpy(j, TMNL.row[i].chars, TMNL.row[i].len);
+		j += TMNL.row[i].len; 
+		*j = '\n';
+		++j;
+	}
+
+	return buffer;
+}
+
+void edsave()
+{
+	if(TMNL.filen == NULL) {
+		return;
+	}
+
+	int len;
+	char* buffer = edrtos(&len);
+
+	// Create a new file if necessary
+	int f = open(TMNL.filen, O_RDWR | O_CREAT, 0644);
+	ftruncate(f, len);
+	write(f, buffer, len);
+	close(f);
+	free(buffer);
+}
