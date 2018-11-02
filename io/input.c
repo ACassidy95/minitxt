@@ -73,6 +73,10 @@ void pkey()
 	int c = rkey();
 
 	switch(c) {
+		case '\r':
+			//TODO
+			break;
+
 		case CTRL_K('q'):
 			write(STDOUT_FILENO, CLEAR_SCREEN, 4);
 			write(STDOUT_FILENO, MV_CURSOR_00, 3);
@@ -80,7 +84,11 @@ void pkey()
 			break;
 
 		case CTRL_K('h'):
-			edstatmsg("Ctrl-Q - quit | ");
+			edstatmsg("Ctrl-Q - quit | CTRL-S - save changes");
+			break;
+
+		case CTRL_K('s'):
+			edsave();
 			break;
 
 		case HOME:
@@ -90,6 +98,12 @@ void pkey()
 			if(TMNL.y_pos < TMNL.ctrows) {
 				TMNL.x_pos = TMNL.row[TMNL.y_pos].len;
 			}
+			break;
+
+		case BSPACE:
+		case CTRL_K('r'):
+		case DEL:
+			//TODO
 			break;
 
 		case PGUP:
@@ -117,6 +131,15 @@ void pkey()
 		case RARROW:
 			mvcursor(c);
 			break;
+
+		// Traditionally, CTRL-L refreshes the screen in
+		// terminal programs but this happens with each 
+		// keypress in minitxt to this combo is ignored
+		/*case CTRL_K('l'):
+		case '\x1b';
+			//TODO
+			break;*/
+
 		default:
 			edinsertchar(c);
 			break;
